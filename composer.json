@@ -1,0 +1,25 @@
+{
+    "name": "guzzlehttp/test-server",
+    "description": "Node.js server and PHP controller",
+    "keywords": [],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Michael Dowling",
+            "email": "mtdowling@gmail.com"
+        }
+    ],
+    "require": {
+        "php": "^7.2.5 || ^8.0",
+        "guzzlehttp/guzzle": "^7.3"
+    },
+    "config": {
+        "preferred-install": "dist",
+        "sort-packages": true
+    },
+    "autoload": {
+        "psr-4": {
+            "GuzzleHttp\\Server\\": "src/"
+        }
+    }
+}
