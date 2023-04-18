@@ -19,7 +19,7 @@ Server::enqueue([
 ]);
 
 $myHttpClient = MyClient();
-$response = $this->makeRequest('GET', Sever::$url);
+$response = $this->makeRequest('GET', Server::$url);
 // $response will be 201
 
 $requests = Server::received();
