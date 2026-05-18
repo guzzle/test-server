@@ -1,5 +1,9 @@
 # Change Log
 
+## 0.3.2
+
+- Start the node.js server without shell backgrounding
+
 ## 0.3.1
 
 - Fix node.js server startup on Windows

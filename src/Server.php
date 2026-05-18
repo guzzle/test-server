@@ -29,6 +29,10 @@ class Server
      * @var Client
      */
     private static $client;
+    /**
+     * @var resource|null
+     */
+    private static $process;
     private static $started = false;
     public static $url = 'http://127.0.0.1:8126/';
     public static $port = 8126;
@@ -159,6 +163,7 @@ class Server
             }
         } finally {
             self::$started = false;
+            self::closeProcess();
         }
     }
 
@@ -192,15 +197,37 @@ class Server
                 throw new InvalidArgumentException('Invalid node.js server port');
             }
 
-            $script = \escapeshellarg(__DIR__ . \DIRECTORY_SEPARATOR . 'server.js');
-            $logFile = \escapeshellarg(\sys_get_temp_dir() . \DIRECTORY_SEPARATOR . 'server.log');
+            $script = __DIR__ . \DIRECTORY_SEPARATOR . 'server.js';
+            $logFile = \sys_get_temp_dir() . \DIRECTORY_SEPARATOR . 'server.log';
 
-            $command = 'Windows' === \PHP_OS_FAMILY
-                ? 'start "" /B node ' . $script . ' ' . $port . ' >> ' . $logFile . ' 2>&1'
-                : 'node ' . $script . ' ' . $port . ' >> ' . $logFile . ' 2>&1 &';
+            $process = \proc_open(
+                'node ' . \escapeshellarg($script) . ' ' . $port,
+                [
+                    0 => ['pipe', 'r'],
+                    1 => ['file', $logFile, 'a'],
+                    2 => ['file', $logFile, 'a'],
+                ],
+                $pipes
+            );
 
-            \exec($command);
-            self::wait();
+            if (!\is_resource($process)) {
+                throw new \RuntimeException('Unable to start node.js server');
+            }
+
+            self::$process = $process;
+            foreach ($pipes as $pipe) {
+                if (\is_resource($pipe)) {
+                    \fclose($pipe);
+                }
+            }
+
+            try {
+                self::wait(50);
+            } catch (\Exception $e) {
+                self::closeProcess();
+
+                throw $e;
+            }
         }
 
         self::$started = true;
@@ -229,5 +256,22 @@ class Server
         }
 
         return self::$client;
+    }
+
+    private static function closeProcess()
+    {
+        if (!\is_resource(self::$process)) {
+            self::$process = null;
+
+            return;
+        }
+
+        $status = \proc_get_status(self::$process);
+        if (!empty($status['running'])) {
+            \proc_terminate(self::$process);
+        }
+
+        \proc_close(self::$process);
+        self::$process = null;
     }
 }
