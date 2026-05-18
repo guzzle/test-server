@@ -38,8 +38,9 @@
  * @license See the LICENSE file that was distributed with this source code.
  */
 
-var http = require('http');
-var url = require('url');
+import * as crypto from 'node:crypto';
+import * as http from 'node:http';
+import * as url from 'node:url';
 
 /**
  * Guzzle node.js server
@@ -54,7 +55,6 @@ var GuzzleServer = function(port, log) {
   var that = this;
 
   var md5 = function(input) {
-    var crypto = require('crypto');
     var hasher = crypto.createHash('md5');
     hasher.update(input);
     return hasher.digest('hex');
@@ -72,7 +72,7 @@ var GuzzleServer = function(port, log) {
   /**
    * Provides authentication handlers (Basic, Digest).
    */
-  var loadAuthentifier = function(type, options) {
+  var loadAuthentifier = async function(type, options) {
     var typeId = type;
     if (type == 'digest') {
       typeId += '.'+(options && options.qop ? options.qop : 'none');
@@ -80,11 +80,13 @@ var GuzzleServer = function(port, log) {
     if (!loadAuthentifier[typeId]) {
       if (!auth) {
         try {
-          auth = require('http-auth');
+          var importedAuth = await import('http-auth');
+          auth = importedAuth.default || importedAuth;
         } catch (e) {
-          if (e.code == 'MODULE_NOT_FOUND') {
+          if (e.code == 'ERR_MODULE_NOT_FOUND' || e.code == 'MODULE_NOT_FOUND') {
             return;
           }
+          throw e;
         }
       }
       switch (type) {
@@ -106,10 +108,10 @@ var GuzzleServer = function(port, log) {
     return loadAuthentifier[typeId];
   };
 
-  var firewallRequest = function(request, req, res, requestHandlerCallback) {
+  var firewallRequest = async function(request, req, res, requestHandlerCallback) {
     var securedAreaUriParts = request.uri.match(/^\/secure\/by-(digest)(\/qop-([^\/]*))?(\/.*)$/);
     if (securedAreaUriParts) {
-      var authentifier = loadAuthentifier(securedAreaUriParts[1], { qop: securedAreaUriParts[2] });
+      var authentifier = await loadAuthentifier(securedAreaUriParts[1], { qop: securedAreaUriParts[2] });
       if (!authentifier) {
         res.writeHead(501, 'HTTP authentication not implemented', { 'Content-Length': 0 });
         res.end();
@@ -240,7 +242,11 @@ var GuzzleServer = function(port, log) {
 
       // Called when the request completes
       req.addListener('end', function() {
-        firewallRequest(request, req, res, receivedRequest);
+        firewallRequest(request, req, res, receivedRequest).catch(function(e) {
+          process.nextTick(function() {
+            throw e;
+          });
+        });
       });
     });
 
@@ -253,9 +259,9 @@ var GuzzleServer = function(port, log) {
 };
 
 // Get the port from the arguments
-port = process.argv.length >= 3 ? process.argv[2] : 8126;
-log = process.argv.length >= 4 ? process.argv[3] : false;
+const port = process.argv.length >= 3 ? process.argv[2] : 8126;
+const log = process.argv.length >= 4 ? process.argv[3] : false;
 
 // Start the server
-server = new GuzzleServer(port, log);
+const server = new GuzzleServer(port, log);
 server.start();

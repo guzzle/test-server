@@ -5,6 +5,8 @@ was extracted to its own package.
 
 The server is useful to use in your integration tests.
 
+Requires Node.js `^20.19 || ^22.13 || >=24` available as `node`.
+
 ```php
 
 use GuzzleHttp\Server\Server;
