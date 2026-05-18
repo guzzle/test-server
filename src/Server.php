@@ -26,7 +26,7 @@ use Psr\Http\Message\ResponseInterface;
 class Server
 {
     /**
-     * @var Client
+     * @var Client|null
      */
     private static $client;
     /**
@@ -62,7 +62,7 @@ class Server
     {
         $data = [];
         foreach ((array) $responses as $response) {
-            if (!($response instanceof ResponseInterface)) {
+            if (!$response instanceof ResponseInterface) {
                 throw new InvalidArgumentException('Invalid response given.');
             }
             $headers = \array_map(static function ($h) {
@@ -70,15 +70,15 @@ class Server
             }, $response->getHeaders());
 
             $data[] = [
-                'status'  => (string) $response->getStatusCode(),
-                'reason'  => $response->getReasonPhrase(),
+                'status' => (string) $response->getStatusCode(),
+                'reason' => $response->getReasonPhrase(),
                 'headers' => $headers,
-                'body'    => \base64_encode((string) $response->getBody())
+                'body' => \base64_encode((string) $response->getBody()),
             ];
         }
 
         self::getClient()->request('PUT', 'guzzle-server/responses', [
-            'json' => $data
+            'json' => $data,
         ]);
     }
 
@@ -96,15 +96,15 @@ class Server
     {
         $data = [
             [
-                'status'  => (string) $statusCode,
-                'reason'  => $reasonPhrase,
+                'status' => (string) $statusCode,
+                'reason' => $reasonPhrase,
                 'headers' => $headers,
-                'body'    => \base64_encode((string) $body)
-            ]
+                'body' => \base64_encode((string) $body),
+            ],
         ];
 
         self::getClient()->request('PUT', 'guzzle-server/responses', [
-            'json' => $data
+            'json' => $data,
         ]);
     }
 
@@ -133,7 +133,7 @@ class Server
             static function ($message) {
                 $uri = $message['uri'];
                 if (isset($message['query_string'])) {
-                    $uri .= '?' . $message['query_string'];
+                    $uri .= '?'.$message['query_string'];
                 }
                 $response = new Psr7\Request(
                     $message['http_method'],
@@ -142,6 +142,7 @@ class Server
                     $message['body'],
                     $message['version']
                 );
+
                 return $response->withUri(
                     $response->getUri()
                         ->withScheme('http')
@@ -197,11 +198,11 @@ class Server
                 throw new InvalidArgumentException('Invalid node.js server port');
             }
 
-            $script = __DIR__ . \DIRECTORY_SEPARATOR . 'server.js';
-            $logFile = \sys_get_temp_dir() . \DIRECTORY_SEPARATOR . 'server.log';
+            $script = __DIR__.\DIRECTORY_SEPARATOR.'server.js';
+            $logFile = \sys_get_temp_dir().\DIRECTORY_SEPARATOR.'server.log';
 
             $process = \proc_open(
-                'node ' . \escapeshellarg($script) . ' ' . $port,
+                'node '.\escapeshellarg($script).' '.$port,
                 [
                     0 => ['pipe', 'r'],
                     1 => ['file', $logFile, 'a'],
@@ -238,8 +239,9 @@ class Server
         try {
             self::getClient()->request('GET', 'guzzle-server/perf', [
                 'connect_timeout' => 5,
-                'timeout'         => 5
+                'timeout' => 5,
             ]);
+
             return true;
         } catch (\Exception $e) {
             return false;
@@ -248,10 +250,10 @@ class Server
 
     private static function getClient()
     {
-        if (!self::$client) {
+        if (null === self::$client) {
             self::$client = new Client([
                 'base_uri' => self::$url,
-                'sync'     => true,
+                'sync' => true,
             ]);
         }
 
