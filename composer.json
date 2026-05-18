@@ -5,13 +5,19 @@
     "license": "MIT",
     "authors": [
         {
+            "name": "Graham Campbell",
+            "email": "hello@gjcampbell.co.uk",
+            "homepage": "https://github.com/GrahamCampbell"
+        },
+        {
             "name": "Michael Dowling",
             "email": "mtdowling@gmail.com"
         }
     ],
     "require": {
         "php": "^7.2.5 || ^8.0",
-        "guzzlehttp/guzzle": "^7.3"
+        "guzzlehttp/guzzle": "^7.10",
+        "guzzlehttp/psr7": "^2.8"
     },
     "config": {
         "preferred-install": "dist",
