@@ -1,5 +1,9 @@
 # Change Log
 
+## 0.3.1
+
+- Fix node.js server startup on Windows
+
 ## 0.3.0
 
 - Harden node.js server startup and shutdown handling

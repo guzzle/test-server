@@ -192,11 +192,12 @@ class Server
                 throw new InvalidArgumentException('Invalid node.js server port');
             }
 
-            $command = 'node '
-                . \escapeshellarg(__DIR__ . '/server.js') . ' '
-                . $port . ' >> '
-                . \escapeshellarg(\sys_get_temp_dir() . '/server.log')
-                . ' 2>&1 &';
+            $script = \escapeshellarg(__DIR__ . \DIRECTORY_SEPARATOR . 'server.js');
+            $logFile = \escapeshellarg(\sys_get_temp_dir() . \DIRECTORY_SEPARATOR . 'server.log');
+
+            $command = 'Windows' === \PHP_OS_FAMILY
+                ? 'start "" /B node ' . $script . ' ' . $port . ' >> ' . $logFile . ' 2>&1'
+                : 'node ' . $script . ' ' . $port . ' >> ' . $logFile . ' 2>&1 &';
 
             \exec($command);
             self::wait();
