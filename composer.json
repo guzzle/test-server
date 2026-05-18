@@ -11,7 +11,13 @@
         },
         {
             "name": "Michael Dowling",
-            "email": "mtdowling@gmail.com"
+            "email": "mtdowling@gmail.com",
+            "homepage": "https://github.com/mtdowling"
+        },
+        {
+            "name": "Tobias Nyholm",
+            "email": "tobias.nyholm@gmail.com",
+            "homepage": "https://github.com/Nyholm"
         }
     ],
     "require": {
