@@ -3,7 +3,9 @@
 namespace GuzzleHttp\Server;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\InvalidArgumentException;
 use GuzzleHttp\Psr7;
+use GuzzleHttp\Utils;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
@@ -50,14 +52,14 @@ class Server
      * @param array|ResponseInterface $responses A single or array of Responses
      *                                           to queue.
      *
-     * @throws \Exception
+     * @throws InvalidArgumentException
      */
     public static function enqueue($responses)
     {
         $data = [];
         foreach ((array) $responses as $response) {
             if (!($response instanceof ResponseInterface)) {
-                throw new \Exception('Invalid response given.');
+                throw new InvalidArgumentException('Invalid response given.');
             }
             $headers = \array_map(static function ($h) {
                 return \implode(' ,', $h);
@@ -107,6 +109,7 @@ class Server
      *
      * @return RequestInterface[]
      *
+     * @throws InvalidArgumentException
      * @throws \RuntimeException
      */
     public static function received()
@@ -116,7 +119,11 @@ class Server
         }
 
         $response = self::getClient()->request('GET', 'guzzle-server/requests');
-        $data = \json_decode($response->getBody(), true);
+        $data = Utils::jsonDecode((string) $response->getBody(), true);
+
+        if (!\is_array($data)) {
+            throw new \RuntimeException('Expected JSON array of received requests from node.js server');
+        }
 
         return \array_map(
             static function ($message) {
@@ -146,11 +153,13 @@ class Server
      */
     public static function stop()
     {
-        if (self::$started) {
-            self::getClient()->request('DELETE', 'guzzle-server');
+        try {
+            if (self::$started) {
+                self::getClient()->request('DELETE', 'guzzle-server');
+            }
+        } finally {
+            self::$started = false;
         }
-
-        self::$started = false;
     }
 
     public static function wait($maxTries = 5)
@@ -172,8 +181,24 @@ class Server
         }
 
         if (!self::isListening()) {
-            \exec('node ' . __DIR__ . '/server.js '
-                . self::$port . ' >> /tmp/server.log 2>&1 &');
+            $port = \filter_var(self::$port, \FILTER_VALIDATE_INT, [
+                'options' => [
+                    'min_range' => 1,
+                    'max_range' => 65535,
+                ],
+            ]);
+
+            if (false === $port) {
+                throw new InvalidArgumentException('Invalid node.js server port');
+            }
+
+            $command = 'node '
+                . \escapeshellarg(__DIR__ . '/server.js') . ' '
+                . $port . ' >> '
+                . \escapeshellarg(\sys_get_temp_dir() . '/server.log')
+                . ' 2>&1 &';
+
+            \exec($command);
             self::wait();
         }
 

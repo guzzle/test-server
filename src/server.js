@@ -111,7 +111,7 @@ var GuzzleServer = function(port, log) {
   var firewallRequest = async function(request, req, res, requestHandlerCallback) {
     var securedAreaUriParts = request.uri.match(/^\/secure\/by-(digest)(\/qop-([^\/]*))?(\/.*)$/);
     if (securedAreaUriParts) {
-      var authentifier = await loadAuthentifier(securedAreaUriParts[1], { qop: securedAreaUriParts[2] });
+      var authentifier = await loadAuthentifier(securedAreaUriParts[1], { qop: securedAreaUriParts[3] });
       if (!authentifier) {
         res.writeHead(501, 'HTTP authentication not implemented', { 'Content-Length': 0 });
         res.end();
@@ -166,7 +166,7 @@ var GuzzleServer = function(port, log) {
         }
         // Get received requests
         var body = JSON.stringify(that.requests);
-        res.writeHead(200, 'OK', { 'Content-Length': body.length });
+        res.writeHead(200, 'OK', { 'Content-Length': Buffer.byteLength(body) });
         res.end(body);
       } else if (req.url == '/guzzle-server/read-timeout') {
         if (that.log) {
@@ -188,7 +188,26 @@ var GuzzleServer = function(port, log) {
         }
         res.writeHead(400, 'NO RESPONSES IN REQUEST', { 'Content-Length': 0 });
       } else {
-        that.responses = JSON.parse(request.body);
+        var responses;
+        try {
+          responses = JSON.parse(request.body);
+        } catch (e) {
+          if (that.log) {
+            console.log('Invalid response JSON: ' + e.message);
+          }
+          res.writeHead(400, 'INVALID RESPONSE JSON', { 'Content-Length': 0 });
+          res.end();
+          return;
+        }
+        if (!Array.isArray(responses)) {
+          if (that.log) {
+            console.log('Response data must be an array');
+          }
+          res.writeHead(400, 'RESPONSES MUST BE AN ARRAY', { 'Content-Length': 0 });
+          res.end();
+          return;
+        }
+        that.responses = responses;
         for (var i = 0; i < that.responses.length; i++) {
           if (that.responses[i].body) {
             that.responses[i].body = Buffer.from(that.responses[i].body, 'base64');
