@@ -1,5 +1,11 @@
 # Change Log
 
+## 1.0.0 - Upcoming
+
+- Dropped support for PHP 7.2 and 7.3
+- Switched from Guzzle 7.x to 8.x and from Guzzle PSR-7 2.x to 3.x
+- Parse ports from Host headers when reconstructing received requests
+
 ## 0.3.2
 
 - Start the node.js server without shell backgrounding
