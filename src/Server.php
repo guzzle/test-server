@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace GuzzleHttp\Server;
 
 use GuzzleHttp\Client;
@@ -131,26 +133,49 @@ class Server
 
         return \array_map(
             static function ($message) {
-                $uri = $message['uri'];
-                if (isset($message['query_string'])) {
-                    $uri .= '?'.$message['query_string'];
+                if (!\is_array($message)) {
+                    throw new \RuntimeException('Expected each received request from node.js server to be an array');
+                }
+
+                foreach (['http_method', 'uri', 'version'] as $key) {
+                    if (!\array_key_exists($key, $message) || !\is_scalar($message[$key])) {
+                        throw new \RuntimeException(\sprintf('Expected received request "%s" from node.js server to be a scalar value', $key));
+                    }
+                }
+
+                if (!\array_key_exists('headers', $message) || !\is_array($message['headers'])) {
+                    throw new \RuntimeException('Expected received request "headers" from node.js server to be an array');
+                }
+
+                if (!\array_key_exists('body', $message) || (!\is_scalar($message['body']) && null !== $message['body'])) {
+                    throw new \RuntimeException('Expected received request "body" from node.js server to be a scalar value or null');
+                }
+
+                $uri = (string) $message['uri'];
+                if (\array_key_exists('query_string', $message) && null !== $message['query_string']) {
+                    if (!\is_scalar($message['query_string'])) {
+                        throw new \RuntimeException('Expected received request "query_string" from node.js server to be a scalar value or null');
+                    }
+                    $uri .= '?'.(string) $message['query_string'];
                 }
                 $response = new Psr7\Request(
-                    $message['http_method'],
+                    (string) $message['http_method'],
                     $uri,
                     $message['headers'],
-                    $message['body'],
-                    $message['version']
+                    (string) $message['body'],
+                    (string) $message['version']
                 );
                 $uri = $response->getUri()->withScheme('http');
                 $host = $response->getHeaderLine('host');
                 if ($host !== '') {
                     $parts = \parse_url('http://'.$host);
-                    if (isset($parts['host'])) {
-                        $uri = $uri->withHost($parts['host']);
-                    }
-                    if (isset($parts['port'])) {
-                        $uri = $uri->withPort($parts['port']);
+                    if (\is_array($parts)) {
+                        if (isset($parts['host'])) {
+                            $uri = $uri->withHost($parts['host']);
+                        }
+                        if (isset($parts['port'])) {
+                            $uri = $uri->withPort($parts['port']);
+                        }
                     }
                 }
 
@@ -241,7 +266,7 @@ class Server
         self::$started = true;
     }
 
-    private static function isListening()
+    private static function isListening(): bool
     {
         try {
             self::getClient()->request('GET', 'guzzle-server/perf', [
@@ -255,7 +280,7 @@ class Server
         }
     }
 
-    private static function getClient()
+    private static function getClient(): Client
     {
         if (null === self::$client) {
             self::$client = new Client([
@@ -267,7 +292,7 @@ class Server
         return self::$client;
     }
 
-    private static function closeProcess()
+    private static function closeProcess(): void
     {
         if (!\is_resource(self::$process)) {
             self::$process = null;
