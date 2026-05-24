@@ -25,7 +25,7 @@ use Psr\Http\Message\ResponseInterface;
  * number of HTTP request response transactions to test the actual sending of
  * requests over the wire without having to leave an internal network.
  */
-class Server
+final class Server
 {
     /**
      * @var Client|null
@@ -38,6 +38,10 @@ class Server
     private static $started = false;
     public static $url = 'http://127.0.0.1:8126/';
     public static $port = 8126;
+
+    private function __construct()
+    {
+    }
 
     /**
      * Flush the received requests from the server
