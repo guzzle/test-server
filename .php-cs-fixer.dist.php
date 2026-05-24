@@ -9,7 +9,6 @@ $config = (new PhpCsFixer\Config())
         '@PHPUnit75Migration:risky' => true,
         '@PSR12:risky' => true,
         '@Symfony' => true,
-        'declare_strict_types' => true,
         'global_namespace_import' => false,
         'no_superfluous_phpdoc_tags' => [
             'allow_mixed' => true,
@@ -25,6 +24,7 @@ $config = (new PhpCsFixer\Config())
         PhpCsFixer\Finder::create()
             ->in(__DIR__.'/src')
             ->name('*.php')
+            ->append([__FILE__])
     )
 ;
 
