@@ -6,6 +6,7 @@
 - Switched from Guzzle 7.x to 8.x and from Guzzle PSR-7 2.x to 3.x
 - Parse ports from Host headers when reconstructing received requests
 - Fixed `Server::enqueue()` to accept a single PSR-7 response as documented
+- Made `Server` final and non-instantiable
 
 ## 0.3.2
 
