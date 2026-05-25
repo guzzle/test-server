@@ -142,12 +142,19 @@ class Server
                     $message['body'],
                     $message['version']
                 );
+                $uri = $response->getUri()->withScheme('http');
+                $host = $response->getHeaderLine('host');
+                if ($host !== '') {
+                    $parts = \parse_url('http://'.$host);
+                    if (isset($parts['host'])) {
+                        $uri = $uri->withHost($parts['host']);
+                    }
+                    if (isset($parts['port'])) {
+                        $uri = $uri->withPort($parts['port']);
+                    }
+                }
 
-                return $response->withUri(
-                    $response->getUri()
-                        ->withScheme('http')
-                        ->withHost($response->getHeaderLine('host'))
-                );
+                return $response->withUri($uri);
             },
             $data
         );

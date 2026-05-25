@@ -1,5 +1,9 @@
 # Change Log
 
+## 0.4.0 - Upcoming
+
+- Parse ports from Host headers when reconstructing received requests
+
 ## 0.3.2
 
 - Start the node.js server without shell backgrounding
