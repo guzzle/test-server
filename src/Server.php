@@ -27,9 +27,6 @@ use Psr\Http\Message\ResponseInterface;
  */
 final class Server
 {
-    /**
-     * @var Client|null
-     */
     private static ?Client $client = null;
     /**
      * @var resource|null
