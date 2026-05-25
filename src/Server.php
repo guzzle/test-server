@@ -48,7 +48,7 @@ final class Server
      *
      * @throws \RuntimeException
      */
-    public static function flush()
+    public static function flush(): ResponseInterface
     {
         return self::getClient()->request('DELETE', 'guzzle-server/requests');
     }
@@ -64,7 +64,7 @@ final class Server
      *
      * @throws InvalidArgumentException
      */
-    public static function enqueue($responses)
+    public static function enqueue($responses): void
     {
         if ($responses instanceof ResponseInterface) {
             $responses = [$responses];
@@ -102,7 +102,7 @@ final class Server
      *
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public static function enqueueRaw($statusCode, $reasonPhrase, $headers, $body)
+    public static function enqueueRaw($statusCode, $reasonPhrase, $headers, $body): void
     {
         $data = [
             [
@@ -126,7 +126,7 @@ final class Server
      * @throws InvalidArgumentException
      * @throws \RuntimeException
      */
-    public static function received()
+    public static function received(): array
     {
         if (!self::$started) {
             return [];
@@ -196,7 +196,7 @@ final class Server
     /**
      * Stop running the node.js server
      */
-    public static function stop()
+    public static function stop(): void
     {
         try {
             if (self::$started) {
@@ -208,7 +208,7 @@ final class Server
         }
     }
 
-    public static function wait($maxTries = 5)
+    public static function wait($maxTries = 5): void
     {
         $tries = 0;
         while (!self::isListening() && ++$tries < $maxTries) {
@@ -220,7 +220,7 @@ final class Server
         }
     }
 
-    public static function start()
+    public static function start(): void
     {
         if (self::$started) {
             return;
