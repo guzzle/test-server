@@ -1,5 +1,9 @@
 # Change Log
 
+## 0.5.0 - Upcoming
+
+- Harden received request reconstruction from node.js server data
+
 ## 0.4.0 - 2026-05-25
 
 - Parse ports from Host headers when reconstructing received requests
