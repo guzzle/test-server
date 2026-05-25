@@ -1,6 +1,6 @@
 # Change Log
 
-## 0.3.3 - Upcoming
+## 0.3.3 - 2026-05-25
 
 - Fixed `Server::enqueue()` to accept a single PSR-7 response as documented
 
