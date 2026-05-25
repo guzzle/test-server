@@ -137,7 +137,7 @@ final class Server
         }
 
         return \array_map(
-            static function ($message) {
+            static function ($message): RequestInterface {
                 if (!\is_array($message)) {
                     throw new \RuntimeException('Expected each received request from node.js server to be an array');
                 }
