@@ -1,6 +1,6 @@
 # Change Log
 
-## 0.4.0 - Upcoming
+## 0.4.0 - 2026-05-25
 
 - Parse ports from Host headers when reconstructing received requests
 
@@ -28,4 +28,4 @@
 
 ## 0.1.0 - 2021-10-05
 
-* First release extracted from Guzzle 7.3
+- First release extracted from Guzzle 7.3
