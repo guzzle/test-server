@@ -27,15 +27,12 @@ use Psr\Http\Message\ResponseInterface;
  */
 final class Server
 {
-    /**
-     * @var Client|null
-     */
-    private static $client;
+    private static ?Client $client = null;
     /**
      * @var resource|null
      */
     private static $process;
-    private static $started = false;
+    private static bool $started = false;
     public static $url = 'http://127.0.0.1:8126/';
     public static $port = 8126;
 
