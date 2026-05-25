@@ -60,6 +60,10 @@ class Server
      */
     public static function enqueue($responses)
     {
+        if ($responses instanceof ResponseInterface) {
+            $responses = [$responses];
+        }
+
         $data = [];
         foreach ((array) $responses as $response) {
             if (!$response instanceof ResponseInterface) {
