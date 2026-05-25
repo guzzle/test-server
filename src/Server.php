@@ -72,7 +72,7 @@ final class Server
             if (!$response instanceof ResponseInterface) {
                 throw new InvalidArgumentException('Invalid response given.');
             }
-            $headers = \array_map(static function ($h) {
+            $headers = \array_map(static function (array $h): string {
                 return \implode(' ,', $h);
             }, $response->getHeaders());
 
@@ -99,7 +99,7 @@ final class Server
      *
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public static function enqueueRaw($statusCode, $reasonPhrase, $headers, $body): void
+    public static function enqueueRaw($statusCode, string $reasonPhrase, array $headers, ?string $body): void
     {
         $data = [
             [
@@ -205,7 +205,7 @@ final class Server
         }
     }
 
-    public static function wait($maxTries = 5): void
+    public static function wait(int $maxTries = 5): void
     {
         $tries = 0;
         while (!self::isListening() && ++$tries < $maxTries) {
