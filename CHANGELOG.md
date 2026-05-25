@@ -1,6 +1,6 @@
 # Change Log
 
-## 0.3.3 - Upcoming
+## 0.4.0 - Upcoming
 
 - Parse ports from Host headers when reconstructing received requests
 
