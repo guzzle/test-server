@@ -177,6 +177,21 @@ var GuzzleServer = function(port, log) {
         setTimeout(function () {
           res.end("slept 60 seconds\n");
         }, 60*1000);
+      } else if (req.url == '/guzzle-server/read-timeout-gzip') {
+        if (that.log) {
+          console.log('Sleeping (gzip)');
+        }
+        var gzipped = require('zlib').gzipSync(
+          Buffer.from('hi there ... this gzip body never finishes\n'.repeat(64))
+        );
+        var half = Math.floor(gzipped.length / 2);
+        res.writeHead(200, 'OK', { 'Content-Encoding': 'gzip' });
+        // Send a valid but incomplete gzip prefix, then stall so the client
+        // times out mid-body while inflating.
+        res.write(gzipped.slice(0, half));
+        setTimeout(function () {
+          res.end(gzipped.slice(half));
+        }, 60*1000);
       }
     } else if (req.method == 'PUT' && req.url == '/guzzle-server/responses') {
       if (that.log) {
