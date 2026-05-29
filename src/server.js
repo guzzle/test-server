@@ -41,6 +41,7 @@
 import * as crypto from 'node:crypto';
 import * as http from 'node:http';
 import * as url from 'node:url';
+import * as zlib from 'node:zlib';
 
 /**
  * Guzzle node.js server
@@ -181,7 +182,7 @@ var GuzzleServer = function(port, log) {
         if (that.log) {
           console.log('Sleeping (gzip)');
         }
-        var gzipped = require('zlib').gzipSync(
+        var gzipped = zlib.gzipSync(
           Buffer.from('hi there ... this gzip body never finishes\n'.repeat(64))
         );
         var half = Math.floor(gzipped.length / 2);
