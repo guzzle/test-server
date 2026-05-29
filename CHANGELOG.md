@@ -7,6 +7,7 @@
 - Added native return types to `Server` control methods
 - Added native parameter types to `Server` utility methods
 - Made `Server` final and non-instantiable
+- Added a `guzzle-server/read-timeout-gzip` endpoint that stalls mid-body
 
 ## 0.5.0 - Upcoming
 
