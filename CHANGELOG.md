@@ -2,7 +2,7 @@
 
 ## 0.5.0 - Upcoming
 
-- Require `guzzlehttp/guzzle` ^7.11, `guzzlehttp/psr7` ^2.11
+- Require `guzzlehttp/guzzle` ^7.11 and `guzzlehttp/psr7` ^2.11
 - Harden received request reconstruction from node.js server data
 
 ## 0.4.0 - 2026-05-25
