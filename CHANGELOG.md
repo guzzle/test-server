@@ -3,10 +3,10 @@
 ## 1.0.0 - Upcoming
 
 - Dropped support for PHP 7.2 and 7.3
-- Switched from Guzzle 7.x to 8.x and from Guzzle PSR-7 2.x to 3.x
+- Require `guzzlehttp/guzzle` ^8.0 and `guzzlehttp/psr7` ^3.0
+- Made `Server` final and non-instantiable
 - Added native return types to `Server` control methods
 - Added native parameter types to `Server` utility methods
-- Made `Server` final and non-instantiable
 - Added a `guzzle-server/read-timeout-gzip` endpoint that stalls mid-body
 
 ## 0.5.0 - 2026-06-02
