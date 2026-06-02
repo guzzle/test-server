@@ -9,8 +9,9 @@
 - Made `Server` final and non-instantiable
 - Added a `guzzle-server/read-timeout-gzip` endpoint that stalls mid-body
 
-## 0.5.0 - Upcoming
+## 0.5.0 - 2026-06-02
 
+- Require `guzzlehttp/guzzle` ^7.11 and `guzzlehttp/psr7` ^2.11
 - Harden received request reconstruction from node.js server data
 
 ## 0.4.0 - 2026-05-25
