@@ -39,3 +39,10 @@ echo $requests[0]->getMethod();
 Call `Server::stop()` when the test process shuts down. Registering it as a
 shutdown function helps avoid leaving the local server running after a failing
 test.
+
+## Version Guidance
+
+| Version | Status       | PHP Version  |
+|---------|--------------|--------------|
+| 1.x     | Experimental | >=7.4,<8.6   |
+| 0.5     | Latest       | >=7.2.5,<8.6 |

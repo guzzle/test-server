@@ -44,6 +44,13 @@ echo $requests[0]->getMethod();
 - [Full documentation](docs/index.md)
 - [Changelog](CHANGELOG.md)
 
+## Version Guidance
+
+| Version | Status       | PHP Version  |
+|---------|--------------|--------------|
+| 1.x     | Experimental | >=7.4,<8.6   |
+| 0.5     | Latest       | >=7.2.5,<8.6 |
+
 ## License
 
 Guzzle Test Server is made available under the MIT License (MIT). Please see [License File](LICENSE) for more information.
