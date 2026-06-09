@@ -6,24 +6,6 @@ You almost never need this package when testing normal Guzzle clients. Prefer Gu
 
 The server requires Node.js `^20.19 || ^22.13 || >=24` available as `node`.
 
-## Installation
-
-Install the test server as a development dependency:
-
-```bash
-composer require --dev guzzlehttp/test-server:^1.0
-```
-
-Alternatively, add it to your project's `composer.json` file:
-
-```json
-{
-    "require-dev": {
-        "guzzlehttp/test-server": "^1.0"
-    }
-}
-```
-
 ## Basic Usage
 
 ```php
