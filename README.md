@@ -48,7 +48,7 @@ echo $requests[0]->getMethod();
 
 ## Documentation
 
-- [Full documentation](docs/index.md)
+- [Usage Guide](docs/usage.md)
 - [Changelog](CHANGELOG.md)
 
 ## License
