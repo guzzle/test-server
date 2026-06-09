@@ -40,6 +40,16 @@ final class Server
     {
     }
 
+    public function __serialize(): array
+    {
+        throw new \LogicException(self::class.' should never be serialized');
+    }
+
+    public function __unserialize(array $data): void
+    {
+        throw new \LogicException(self::class.' should never be unserialized');
+    }
+
     /**
      * Flush the received requests from the server
      *
