@@ -4,6 +4,7 @@
 
 - Dropped support for PHP 7.2 and 7.3
 - Require `guzzlehttp/guzzle` ^8.0 and `guzzlehttp/psr7` ^3.0
+- Reject native PHP serialization of `Server`
 - Made `Server` final and non-instantiable
 - Added native return types to `Server` control methods
 - Added native parameter types to `Server` utility methods
