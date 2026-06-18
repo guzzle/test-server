@@ -300,6 +300,7 @@ final class Server
         if (null === self::$client) {
             self::$client = new Client([
                 'base_uri' => self::$url,
+                'proxy' => '',
                 'sync' => true,
             ]);
         }
