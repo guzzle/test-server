@@ -1,6 +1,6 @@
 # Change Log
 
-## 0.5.1 - Upcoming
+## 0.5.1 - 2026-06-18
 
 - Disable proxying on the control client so an ambient `http_proxy` cannot misroute it
 - Return a 500 instead of crashing when the response queue is empty
