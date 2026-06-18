@@ -234,6 +234,11 @@ var GuzzleServer = function(port, log) {
       }
       that.requests.push(request);
       var response = that.responses.shift();
+      if (!response) {
+        res.writeHead(500);
+        res.end('No responses in queue');
+        return;
+      }
       res.writeHead(response.status, response.reason, response.headers);
       res.end(response.body);
     }

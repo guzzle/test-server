@@ -1,5 +1,10 @@
 # Change Log
 
+## 0.5.1 - Upcoming
+
+- Disable proxying on the control client so an ambient `http_proxy` cannot misroute it
+- Return a 500 instead of crashing when the response queue is empty
+
 ## 0.5.0 - 2026-06-02
 
 - Require `guzzlehttp/guzzle` ^7.11 and `guzzlehttp/psr7` ^2.11
