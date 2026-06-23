@@ -67,7 +67,7 @@ class Server
         $data = [];
         foreach ((array) $responses as $response) {
             if (!$response instanceof ResponseInterface) {
-                throw new InvalidArgumentException('Invalid response given.');
+                throw new InvalidArgumentException(\sprintf('Invalid response given; got %s.', \get_debug_type($response)));
             }
             $headers = \array_map(static function ($h) {
                 return \implode(' ,', $h);
@@ -130,7 +130,7 @@ class Server
         $data = Utils::jsonDecode((string) $response->getBody(), true);
 
         if (!\is_array($data)) {
-            throw new \RuntimeException('Expected JSON array of received requests from node.js server');
+            throw new \RuntimeException(\sprintf('Expected JSON array of received requests from node.js server; got %s', \get_debug_type($data)));
         }
 
         return \array_map(
@@ -140,8 +140,12 @@ class Server
                 }
 
                 foreach (['http_method', 'uri', 'version'] as $key) {
-                    if (!\array_key_exists($key, $message) || !\is_scalar($message[$key])) {
-                        throw new \RuntimeException(\sprintf('Expected received request "%s" from node.js server to be a scalar value', $key));
+                    if (!\array_key_exists($key, $message)) {
+                        throw new \RuntimeException(\sprintf('Expected received request "%s" from node.js server to be present', $key));
+                    }
+
+                    if (!\is_scalar($message[$key])) {
+                        throw new \RuntimeException(\sprintf('Expected received request "%s" from node.js server to be a scalar value; got %s', $key, \get_debug_type($message[$key])));
                     }
                 }
 

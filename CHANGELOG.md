@@ -2,6 +2,7 @@
 
 ## 0.6.0 - Upcoming
 
+- Improve diagnostics for invalid responses and malformed received requests
 - Require `guzzlehttp/guzzle` ^7.12.3 and `guzzlehttp/psr7` ^2.12.3
 
 ## 0.5.1 - 2026-06-18
