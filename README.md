@@ -17,7 +17,7 @@ The server requires Node.js `^20.19 || ^22.13 || >=24` available as `node`.
 | Version | Status       | PHP Version  |
 |---------|--------------|--------------|
 | 1.x     | Experimental | >=7.4,<8.6   |
-| 0.5.x   | Latest       | >=7.2.5,<8.6 |
+| 0.6.x   | Latest       | >=7.2.5,<8.6 |
 
 ## Quick Start
 
