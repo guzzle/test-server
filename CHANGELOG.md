@@ -10,6 +10,11 @@
 - Added native parameter types to `Server` utility methods
 - Added a `guzzle-server/read-timeout-gzip` endpoint that stalls mid-body
 
+## 0.6.0 - 2026-06-23
+
+- Require `guzzlehttp/guzzle` ^7.12.3 and `guzzlehttp/psr7` ^2.12.3
+- Improve diagnostics for invalid responses and malformed received requests
+
 ## 0.5.1 - 2026-06-18
 
 - Disable proxying on the control client so an ambient `http_proxy` cannot misroute it
