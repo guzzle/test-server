@@ -67,10 +67,16 @@ Server::enqueue([
 ]);
 ```
 
-Use `Server::enqueueRaw()` when a PSR-7 response is not suitable, such as when you need exact headers or a raw reason phrase.
+Use `Server::enqueueRaw()` when a PSR-7 response is not suitable, such as when you need exact headers or a raw reason phrase. The response is still written through Node's HTTP response handling.
 
 ```php
 Server::enqueueRaw(200, 'OK', ['X-Test' => 'raw'], 'response body');
+```
+
+Use `Server::enqueueRawBytes()` when a test needs a byte-exact response that bypasses Node's HTTP response handling entirely. The bytes are written straight to the client socket and the connection is closed after they are written. This is useful for emulating misbehaving servers that send protocol-invalid bytes, such as a body after a HEAD response.
+
+```php
+Server::enqueueRawBytes("HTTP/1.1 200 OK\r\nContent-Length: 5\r\n\r\nhello");
 ```
 
 ## Inspecting Requests

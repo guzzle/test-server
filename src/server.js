@@ -225,7 +225,7 @@ var GuzzleServer = function(port, log) {
         }
         that.responses = responses;
         for (var i = 0; i < that.responses.length; i++) {
-          if (that.responses[i].body) {
+          if (Object.prototype.hasOwnProperty.call(that.responses[i], 'body') && that.responses[i].body !== null) {
             that.responses[i].body = Buffer.from(that.responses[i].body, 'base64');
           }
         }
@@ -253,6 +253,13 @@ var GuzzleServer = function(port, log) {
       if (!response) {
         res.writeHead(500);
         res.end('No responses in queue');
+        return;
+      }
+      if (response.raw === true) {
+        if (that.log) {
+          console.log('Returning raw response from queue');
+        }
+        res.socket.end(response.body);
         return;
       }
       res.writeHead(response.status, response.reason, response.headers);
