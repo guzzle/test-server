@@ -100,7 +100,9 @@ final class Server
     }
 
     /**
-     * Queue a single raw response manually, to handle cases where PSR7 response is not suitable.
+     * Queue a single response manually, to handle cases where PSR7 response is not suitable.
+     *
+     * This response is still written through Node's HTTP response handling.
      *
      * @param int|string  $statusCode   Status code for the response, e.g. 200
      * @param string      $reasonPhrase Status reason response e.g "OK"
@@ -122,6 +124,27 @@ final class Server
 
         self::getClient()->request('PUT', 'guzzle-server/responses', [
             'json' => $data,
+        ]);
+    }
+
+    /**
+     * Queue a single response as verbatim bytes written straight to the
+     * client socket, bypassing Node's HTTP response handling entirely. The
+     * connection is closed after the bytes are written. Use this to emulate
+     * misbehaving servers, e.g. one that sends a body in response to a HEAD
+     * request.
+     *
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    public static function enqueueRawBytes(string $bytes): void
+    {
+        self::getClient()->request('PUT', 'guzzle-server/responses', [
+            'json' => [
+                [
+                    'raw' => true,
+                    'body' => \base64_encode($bytes),
+                ],
+            ],
         ]);
     }
 
