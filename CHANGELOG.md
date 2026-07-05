@@ -10,6 +10,7 @@
 - Added native parameter types to `Server` utility methods
 - Added a `guzzle-server/read-timeout-gzip` endpoint that stalls mid-body
 - Added `Server::enqueueRawBytes()` to queue verbatim-byte responses that bypass Node's HTTP handling
+- Inline Digest auth so secure endpoints avoid optional `http-auth` and no-qop is deterministic
 
 ## 0.6.0 - 2026-06-23
 
