@@ -26,9 +26,8 @@
  *      > Host: 127.0.0.1:8126
  *
  *      < HTTP/1.1 401 Unauthorized
- *      < WWW-Authenticate: Digest realm="Digest Test", qop="auth", nonce="0796e98e1aeef43141fab2a66bf4521a", algorithm="MD5", stale="false"
- *      <
- *      < 401 Unauthorized
+ *      < WWW-Authenticate: Digest realm="Digest Test", nonce="<32 hex chars>", algorithm=MD5, qop="auth"
+ *      < Content-Length: 0
  *
  *  - Shutdown the server
  *      > DELETE /guzzle-server
@@ -61,67 +60,151 @@ var GuzzleServer = function(port, log) {
     return hasher.digest('hex');
   };
 
-  /**
-   * Node.js HTTP server authentication module.
-   *
-   * It is only initialized on demand (by loadAuthentifier). This avoids
-   * requiring the dependency to http-auth on standard operations, and the
-   * performance hit at startup.
-   */
-  var auth;
+  var digestCredentials = {realm: 'Digest Test', login: 'me', password: 'test'};
+  var issuedDigestNonces = new Set();
 
-  /**
-   * Provides authentication handlers (Basic, Digest).
-   */
-  var loadAuthentifier = async function(type, options) {
-    var typeId = type;
-    if (type == 'digest') {
-      typeId += '.'+(options && options.qop ? options.qop : 'none');
+  var digestChallengeHeader = function(qop) {
+    var nonce = crypto.randomBytes(16).toString('hex');
+    issuedDigestNonces.add(nonce);
+
+    var header = 'Digest realm="' + digestCredentials.realm + '", nonce="'
+      + nonce + '", algorithm=MD5';
+    if (qop) {
+      header += ', qop="' + qop + '"';
     }
-    if (!loadAuthentifier[typeId]) {
-      if (!auth) {
-        try {
-          var importedAuth = await import('http-auth');
-          auth = importedAuth.default || importedAuth;
-        } catch (e) {
-          if (e.code == 'ERR_MODULE_NOT_FOUND' || e.code == 'MODULE_NOT_FOUND') {
-            return;
-          }
-          throw e;
-        }
-      }
-      switch (type) {
-        case 'digest':
-          var digestParams = {
-            realm: 'Digest Test',
-            login: 'me',
-            password: 'test'
-          };
-          if (options && options.qop) {
-            digestParams.qop = options.qop;
-          }
-          loadAuthentifier[typeId] = auth.digest(digestParams, function(username, callback) {
-            callback(md5(digestParams.login + ':' + digestParams.realm + ':' + digestParams.password));
-          });
-          break
-      }
-    }
-    return loadAuthentifier[typeId];
+    return header;
   };
 
-  var firewallRequest = async function(request, req, res, requestHandlerCallback) {
+  var parseDigestAuthorization = function(header) {
+    var scheme = /^Digest[ \t]+/i.exec(header || '');
+    if (!scheme) {
+      return null;
+    }
+
+    var params = Object.create(null);
+    var offset = scheme[0].length;
+    var pattern = /([!#$%&'*+\-.^_`|~0-9A-Za-z]+)=(?:"((?:[^"\\]|\\.)*)"|([^,\s]+))/y;
+    var match;
+
+    while (offset < header.length) {
+      while (header[offset] === ' ' || header[offset] === '\t') {
+        offset++;
+      }
+
+      pattern.lastIndex = offset;
+      match = pattern.exec(header);
+      if (!match) {
+        return null;
+      }
+
+      var name = match[1].toLowerCase();
+      if (Object.prototype.hasOwnProperty.call(params, name)) {
+        return null;
+      }
+
+      params[name] = match[2] !== undefined
+        ? match[2].replace(/\\(.)/g, '$1')
+        : match[3];
+
+      offset = pattern.lastIndex;
+
+      while (header[offset] === ' ' || header[offset] === '\t') {
+        offset++;
+      }
+
+      if (offset === header.length) {
+        return params;
+      }
+
+      if (header[offset] !== ',') {
+        return null;
+      }
+
+      offset++;
+      if (offset === header.length) {
+        return null;
+      }
+    }
+
+    return params;
+  };
+
+  var hasOnlyDigestParams = function(params, names) {
+    var allowed = Object.create(null);
+    for (var i = 0; i < names.length; i++) {
+      allowed[names[i]] = true;
+    }
+
+    for (var name in params) {
+      if (!allowed[name]) {
+        return false;
+      }
+    }
+
+    return true;
+  };
+
+  var digestResponseEquals = function(expected, actual) {
+    if (!/^[0-9a-f]{32}$/i.test(actual || '')) {
+      return false;
+    }
+
+    var expectedBuffer = Buffer.from(expected, 'hex');
+    var actualBuffer = Buffer.from(actual, 'hex');
+
+    return expectedBuffer.length === actualBuffer.length
+      && crypto.timingSafeEqual(expectedBuffer, actualBuffer);
+  };
+
+  var checkDigestAuthorization = function(req, qop) {
+    var params = parseDigestAuthorization(req.headers['authorization']);
+    var expectedParams = qop
+      ? ['username', 'realm', 'nonce', 'uri', 'response', 'algorithm', 'qop', 'nc', 'cnonce']
+      : ['username', 'realm', 'nonce', 'uri', 'response', 'algorithm'];
+
+    if (!params || !hasOnlyDigestParams(params, expectedParams)
+        || params.username !== digestCredentials.login
+        || params.realm !== digestCredentials.realm
+        || !params.nonce || !issuedDigestNonces.has(params.nonce)
+        || params.uri !== req.url
+        || !params.algorithm || params.algorithm.toUpperCase() !== 'MD5') {
+      return false;
+    }
+
+    var ha1 = md5(digestCredentials.login + ':' + digestCredentials.realm + ':' + digestCredentials.password);
+    var ha2 = md5(req.method + ':' + req.url);
+    var expected;
+
+    if (qop) {
+      if (params.qop !== qop
+          || !/^[0-9a-f]{8}$/i.test(params.nc || '')
+          || params.nc === '00000000'
+          || !params.cnonce) {
+        return false;
+      }
+
+      expected = md5(ha1 + ':' + params.nonce + ':' + params.nc + ':' + params.cnonce + ':' + qop + ':' + ha2);
+    } else {
+      expected = md5(ha1 + ':' + params.nonce + ':' + ha2);
+    }
+
+    return digestResponseEquals(expected, params.response);
+  };
+
+  var firewallRequest = function(request, req, res, requestHandlerCallback) {
     var securedAreaUriParts = request.uri.match(/^\/secure\/by-(digest)(\/qop-([^\/]*))?(\/.*)$/);
     if (securedAreaUriParts) {
-      var authentifier = await loadAuthentifier(securedAreaUriParts[1], { qop: securedAreaUriParts[3] });
-      if (!authentifier) {
-        res.writeHead(501, 'HTTP authentication not implemented', { 'Content-Length': 0 });
+      var qop = securedAreaUriParts[3] || null;
+      if (!checkDigestAuthorization(req, qop)) {
+        res.writeHead(401, 'Unauthorized', {
+          'WWW-Authenticate': digestChallengeHeader(qop),
+          'Content-Length': 0
+        });
         res.end();
         return;
       }
-      authentifier.check(req, res, function(req, res) {
-        req.url = securedAreaUriParts[4];
-        requestHandlerCallback(request, req, res);
-      });
+      req.url = securedAreaUriParts[4];
+      requestHandlerCallback(request, req, res);
     } else {
       requestHandlerCallback(request, req, res);
     }
@@ -289,11 +372,7 @@ var GuzzleServer = function(port, log) {
 
       // Called when the request completes
       req.addListener('end', function() {
-        firewallRequest(request, req, res, receivedRequest).catch(function(e) {
-          process.nextTick(function() {
-            throw e;
-          });
-        });
+        firewallRequest(request, req, res, receivedRequest);
       });
     });
 
