@@ -4,7 +4,7 @@ Use the test server for tests that need a local HTTP endpoint with queued respon
 
 ## When to Use the Test Server
 
-You almost never need this package when testing normal Guzzle clients. Prefer Guzzle's [Mock Handler](https://github.com/guzzle/guzzle/blob/8.0/docs/testing.md#mock-handler) and [History Middleware](https://github.com/guzzle/guzzle/blob/8.0/docs/testing.md#history-middleware) for most client tests. Use the test server when implementing HTTP handlers or when a test must exercise an actual local HTTP server.
+You almost never need this package when testing normal Guzzle clients. Prefer Guzzle's [Mock Handler](https://github.com/guzzle/guzzle/blob/8.0/docs/testing-guzzle-clients.md#mock-handler) and [History Middleware](https://github.com/guzzle/guzzle/blob/8.0/docs/testing-guzzle-clients.md#history-middleware) for most client tests. Use the test server when implementing HTTP handlers or when a test must exercise an actual local HTTP server.
 
 ## Basic Usage
 
@@ -103,4 +103,4 @@ echo count(Server::received());
 
 ## Related
 
-- [Guzzle Testing Documentation](https://github.com/guzzle/guzzle/blob/8.0/docs/testing.md)
+- [Guzzle Testing Documentation](https://github.com/guzzle/guzzle/blob/8.0/docs/testing-guzzle-clients.md)
