@@ -8,6 +8,7 @@
 - Made `Server` final and non-instantiable
 - Added native return types to `Server` control methods
 - Added native parameter types to `Server` utility methods
+- Added native string and int types to the public `Server::$url` and `Server::$port` configuration properties
 - Added a `guzzle-server/read-timeout-gzip` endpoint that stalls mid-body
 - Added `Server::enqueueRawBytes()` to queue verbatim-byte responses that bypass Node's HTTP handling
 - Inline Digest auth so secure endpoints avoid optional `http-auth` and no-qop is deterministic
