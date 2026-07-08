@@ -49,6 +49,7 @@ echo $requests[0]->getMethod();
 ## Documentation
 
 - [Test Server Usage](docs/test-server-usage.md)
+- [Upgrade Guide](UPGRADING.md)
 - [Changelog](CHANGELOG.md)
 
 ## License
