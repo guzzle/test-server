@@ -51,7 +51,8 @@ final class Server
     }
 
     /**
-     * Flush the received requests from the server
+     * Clear the list of received requests. It does not change the queued
+     * responses.
      *
      * @throws \RuntimeException
      */
@@ -63,8 +64,10 @@ final class Server
     /**
      * Queue an array of responses or a single response on the server.
      *
-     * Any currently queued responses will be overwritten.  Subsequent requests
-     * on the server will return queued responses in FIFO order.
+     * When responses are queued, they replace any previously queued responses.
+     * As the server receives requests, queued responses are returned in FIFO
+     * order. When the queue is empty, the server returns a 500 response and
+     * does not record the request.
      *
      * @param array|ResponseInterface $responses A single or array of Responses
      *                                           to queue.
@@ -100,9 +103,10 @@ final class Server
     }
 
     /**
-     * Queue a single response manually, to handle cases where PSR7 response is not suitable.
+     * Queue a single response manually, for cases where a PSR-7 response is not
+     * suitable, such as when you need exact headers or a raw reason phrase.
      *
-     * This response is still written through Node's HTTP response handling.
+     * The response is still written through Node's HTTP response handling.
      *
      * @param int|string  $statusCode   Status code for the response, e.g. 200
      * @param string      $reasonPhrase Status reason response e.g "OK"
@@ -128,11 +132,11 @@ final class Server
     }
 
     /**
-     * Queue a single response as verbatim bytes written straight to the
-     * client socket, bypassing Node's HTTP response handling entirely. The
-     * connection is closed after the bytes are written. Use this to emulate
-     * misbehaving servers, e.g. one that sends a body in response to a HEAD
-     * request.
+     * Queue a single response as verbatim bytes written straight to the client
+     * socket, bypassing Node's HTTP response handling entirely. The connection
+     * is closed after the bytes are written. Use this to emulate misbehaving
+     * servers that send protocol-invalid bytes, such as one that sends a body
+     * in response to a HEAD request.
      *
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
@@ -149,7 +153,9 @@ final class Server
     }
 
     /**
-     * Get all of the received requests
+     * Get all of the received requests.
+     *
+     * Before the server has been started, it returns an empty array.
      *
      * @return RequestInterface[]
      *
