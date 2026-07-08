@@ -1,8 +1,13 @@
 # Guzzle Test Server
 
-`guzzlehttp/test-server` is a testing helper for PHP HTTP clients. It starts a local Node.js HTTP server, lets your tests queue responses, and records the requests your client sends.
+`guzzlehttp/test-server` is a testing helper for PHP HTTP clients. It starts a
+local Node.js HTTP server, lets your tests queue responses, and records the
+requests your client sends.
 
-Most Guzzle client tests should use Guzzle's MockHandler and History Middleware instead of a real server. Use this package for handler tests and integration tests that need a predictable HTTP endpoint. It is not intended to be a general-purpose web server or a production dependency.
+Most Guzzle client tests should use Guzzle's MockHandler and History Middleware
+instead of a real server. Use this package for handler tests and integration
+tests that need a predictable HTTP endpoint. It is not intended to be a
+general-purpose web server or a production dependency.
 
 ## Installation
 
@@ -54,4 +59,5 @@ echo $requests[0]->getMethod();
 
 ## License
 
-Guzzle Test Server is made available under the MIT License (MIT). Please see [License File](LICENSE) for more information.
+Guzzle Test Server is made available under the MIT License (MIT). Please see
+[License File](LICENSE) for more information.
