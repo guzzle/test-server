@@ -17,8 +17,10 @@
 - Classes holding streams, resources, or callbacks reject native PHP
   serialization, and refusal messages report the class name with
   `static::class`.
-- Reject non-finite floats where numeric values are accepted or converted to
-  strings.
+- Never cast a float to string unless it is known to be finite: reject
+  non-finite floats where numeric values are accepted, and where one must be
+  stringified handle it explicitly, such as
+  `\is_nan($value) ? 'NAN' : ($value > 0 ? 'INF' : '-INF')`.
 - This package has no test suite of its own; it is exercised by Guzzle's HTTP
   handler integration tests, which use it as a development dependency.
 - Changes in behavior need a `CHANGELOG.md` entry in the unreleased section of
