@@ -12,6 +12,7 @@
 - Added a `guzzle-server/read-timeout-gzip` endpoint that stalls mid-body
 - Added `guzzle-server/drip-timeout` and `guzzle-server/drip-timeout-gzip` endpoints that drip the body every 100ms
 - Added a `guzzle-server/drip-timeout-headers` endpoint that drips the header block every 100ms
+- Added a `guzzle-server/stall-brief` endpoint that stalls mid-body for 1.5s, then completes
 - Added `Server::enqueueRawBytes()` to queue verbatim-byte responses that bypass Node's HTTP handling
 - Inline Digest auth so secure endpoints avoid optional `http-auth` and no-qop is deterministic
 
