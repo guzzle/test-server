@@ -10,6 +10,8 @@
 - Added native parameter types to `Server` utility methods
 - Added native string and int types to the public `Server::$url` and `Server::$port` configuration properties
 - Added a `guzzle-server/read-timeout-gzip` endpoint that stalls mid-body
+- Added `guzzle-server/drip-timeout` and `guzzle-server/drip-timeout-gzip` endpoints that drip the body every 100ms
+- Added a `guzzle-server/drip-timeout-headers` endpoint that drips the header block every 100ms
 - Added `Server::enqueueRawBytes()` to queue verbatim-byte responses that bypass Node's HTTP handling
 - Inline Digest auth so secure endpoints avoid optional `http-auth` and no-qop is deterministic
 

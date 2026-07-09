@@ -276,6 +276,69 @@ var GuzzleServer = function(port, log) {
         setTimeout(function () {
           res.end(gzipped.slice(half));
         }, 60*1000);
+      } else if (req.url == '/guzzle-server/drip-timeout') {
+        if (that.log) {
+          console.log('Dripping response body');
+        }
+        res.writeHead(200, 'OK');
+        // Send one body byte every 100ms so no single read stalls, while the
+        // whole body takes ~2 seconds to arrive.
+        var dripped = 0;
+        var dripInterval = setInterval(function () {
+          res.write('.');
+          if (++dripped >= 20) {
+            clearInterval(dripInterval);
+            res.end();
+          }
+        }, 100);
+        req.on('close', function () {
+          clearInterval(dripInterval);
+        });
+      } else if (req.url == '/guzzle-server/drip-timeout-gzip') {
+        if (that.log) {
+          console.log('Dripping response body (gzip)');
+        }
+        var gzippedDrip = zlib.gzipSync(
+          Buffer.from('hi there ... this gzip body arrives slowly\n'.repeat(64))
+        );
+        var pieceLength = Math.ceil(gzippedDrip.length / 20);
+        var offset = 0;
+        res.writeHead(200, 'OK', { 'Content-Encoding': 'gzip' });
+        // Send a valid gzip slice every 100ms so no single read stalls, while
+        // the whole body takes ~2 seconds to arrive.
+        var gzipDripInterval = setInterval(function () {
+          res.write(gzippedDrip.slice(offset, offset + pieceLength));
+          offset += pieceLength;
+          if (offset >= gzippedDrip.length) {
+            clearInterval(gzipDripInterval);
+            res.end();
+          }
+        }, 100);
+        req.on('close', function () {
+          clearInterval(gzipDripInterval);
+        });
+      } else if (req.url == '/guzzle-server/drip-timeout-headers') {
+        if (that.log) {
+          console.log('Dripping response headers');
+        }
+        // Write the header block to the raw socket so the header phase itself
+        // arrives slowly (~0.8 seconds) without any single read stalling.
+        res.socket.write('HTTP/1.1 200 OK\r\n');
+        var headerCount = 0;
+        var headerInterval = setInterval(function () {
+          if (res.socket.destroyed) {
+            clearInterval(headerInterval);
+            return;
+          }
+          res.socket.write('X-Drip-' + headerCount + ': ' + headerCount + '\r\n');
+          if (++headerCount >= 8) {
+            clearInterval(headerInterval);
+            res.socket.end('Content-Length: 2\r\nConnection: close\r\n\r\nok');
+          }
+        }, 100);
+        req.on('close', function () {
+          clearInterval(headerInterval);
+        });
       }
     } else if (req.method == 'PUT' && req.url == '/guzzle-server/responses') {
       if (that.log) {
