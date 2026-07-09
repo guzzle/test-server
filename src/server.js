@@ -282,18 +282,21 @@ var GuzzleServer = function(port, log) {
         }
         res.writeHead(200, 'OK');
         // Send one body byte every 100ms so no single read stalls, while the
-        // whole body takes ~2 seconds to arrive.
+        // whole body takes ~2 seconds to arrive. The disconnect check runs
+        // inside the tick because the request 'close' event fires when the
+        // message completes on current Node, not when the connection closes.
         var dripped = 0;
         var dripInterval = setInterval(function () {
+          if (res.writableEnded || res.destroyed || !res.socket || res.socket.destroyed) {
+            clearInterval(dripInterval);
+            return;
+          }
           res.write('.');
           if (++dripped >= 20) {
             clearInterval(dripInterval);
             res.end();
           }
         }, 100);
-        req.on('close', function () {
-          clearInterval(dripInterval);
-        });
       } else if (req.url == '/guzzle-server/drip-timeout-gzip') {
         if (that.log) {
           console.log('Dripping response body (gzip)');
@@ -307,6 +310,10 @@ var GuzzleServer = function(port, log) {
         // Send a valid gzip slice every 100ms so no single read stalls, while
         // the whole body takes ~2 seconds to arrive.
         var gzipDripInterval = setInterval(function () {
+          if (res.writableEnded || res.destroyed || !res.socket || res.socket.destroyed) {
+            clearInterval(gzipDripInterval);
+            return;
+          }
           res.write(gzippedDrip.slice(offset, offset + pieceLength));
           offset += pieceLength;
           if (offset >= gzippedDrip.length) {
@@ -314,9 +321,6 @@ var GuzzleServer = function(port, log) {
             res.end();
           }
         }, 100);
-        req.on('close', function () {
-          clearInterval(gzipDripInterval);
-        });
       } else if (req.url == '/guzzle-server/drip-timeout-headers') {
         if (that.log) {
           console.log('Dripping response headers');
@@ -326,7 +330,7 @@ var GuzzleServer = function(port, log) {
         res.socket.write('HTTP/1.1 200 OK\r\n');
         var headerCount = 0;
         var headerInterval = setInterval(function () {
-          if (res.socket.destroyed) {
+          if (!res.socket || res.socket.destroyed) {
             clearInterval(headerInterval);
             return;
           }
@@ -336,9 +340,6 @@ var GuzzleServer = function(port, log) {
             res.socket.end('Content-Length: 2\r\nConnection: close\r\n\r\nok');
           }
         }, 100);
-        req.on('close', function () {
-          clearInterval(headerInterval);
-        });
       }
     } else if (req.method == 'PUT' && req.url == '/guzzle-server/responses') {
       if (that.log) {
