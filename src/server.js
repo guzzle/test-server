@@ -340,6 +340,17 @@ var GuzzleServer = function(port, log) {
             res.socket.end('Content-Length: 2\r\nConnection: close\r\n\r\nok');
           }
         }, 100);
+      } else if (req.url == '/guzzle-server/stall-brief') {
+        if (that.log) {
+          console.log('Stalling briefly');
+        }
+        // Stall mid-body for longer than a small socket timeout, then finish,
+        // so a completed response can be observed without a long wait.
+        res.writeHead(200, 'OK');
+        res.write('partial-');
+        setTimeout(function () {
+          res.end('rest');
+        }, 1500);
       }
     } else if (req.method == 'PUT' && req.url == '/guzzle-server/responses') {
       if (that.log) {
