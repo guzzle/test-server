@@ -281,6 +281,9 @@ var GuzzleServer = function(port, log) {
           console.log('Dripping response body');
         }
         res.writeHead(200, 'OK');
+        // Flush the headers now; Node would otherwise hold them until the
+        // first timer tick, risking the client's header-phase timeout.
+        res.flushHeaders();
         // Send one body byte every 100ms so no single read stalls, while the
         // whole body takes ~2 seconds to arrive. The disconnect check runs
         // inside the tick because the request 'close' event fires when the
@@ -307,6 +310,9 @@ var GuzzleServer = function(port, log) {
         var pieceLength = Math.ceil(gzippedDrip.length / 20);
         var offset = 0;
         res.writeHead(200, 'OK', { 'Content-Encoding': 'gzip' });
+        // Flush the headers now; Node would otherwise hold them until the
+        // first timer tick, risking the client's header-phase timeout.
+        res.flushHeaders();
         // Send a valid gzip slice every 100ms so no single read stalls, while
         // the whole body takes ~2 seconds to arrive.
         var gzipDripInterval = setInterval(function () {
