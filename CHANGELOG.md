@@ -16,6 +16,11 @@
 - Added `Server::enqueueRawBytes()` to queue verbatim-byte responses that bypass Node's HTTP handling
 - Inline Digest auth so secure endpoints avoid optional `http-auth` and no-qop is deterministic
 
+## 0.7.0 - 2026-07-16
+
+- Require `guzzlehttp/guzzle` ^7.13.3 and `guzzlehttp/psr7` ^2.12.4
+- Decode received request data without Guzzle's deprecated JSON utility
+
 ## 0.6.0 - 2026-06-23
 
 - Require `guzzlehttp/guzzle` ^7.12.3 and `guzzlehttp/psr7` ^2.12.3
