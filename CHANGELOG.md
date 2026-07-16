@@ -1,5 +1,9 @@
 # Change Log
 
+## 0.7.0 - Upcoming
+
+- Decode received request data without Guzzle's deprecated JSON utility
+
 ## 0.6.0 - 2026-06-23
 
 - Require `guzzlehttp/guzzle` ^7.12.3 and `guzzlehttp/psr7` ^2.12.3
