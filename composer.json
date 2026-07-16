@@ -21,8 +21,8 @@
     ],
     "require": {
         "php": "^7.2.5 || ^8.0",
-        "guzzlehttp/guzzle": "^7.12.3",
-        "guzzlehttp/psr7": "^2.12.3",
+        "guzzlehttp/guzzle": "^7.13.3",
+        "guzzlehttp/psr7": "^2.12.4",
         "symfony/polyfill-php80": "^1.25"
     },
     "require-dev": {
