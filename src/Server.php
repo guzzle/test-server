@@ -7,7 +7,6 @@ namespace GuzzleHttp\Server;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\InvalidArgumentException;
 use GuzzleHttp\Psr7;
-use GuzzleHttp\Utils;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
@@ -160,6 +159,7 @@ final class Server
      * @return RequestInterface[]
      *
      * @throws InvalidArgumentException
+     * @throws \JsonException
      * @throws \RuntimeException
      */
     public static function received(): array
@@ -169,7 +169,7 @@ final class Server
         }
 
         $response = self::getClient()->request('GET', 'guzzle-server/requests');
-        $data = Utils::jsonDecode((string) $response->getBody(), true);
+        $data = \json_decode((string) $response->getBody(), true, 512, \JSON_THROW_ON_ERROR);
 
         if (!\is_array($data)) {
             throw new \RuntimeException(\sprintf('Expected JSON array of received requests from node.js server; got %s', \get_debug_type($data)));
