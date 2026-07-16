@@ -5,7 +5,6 @@ namespace GuzzleHttp\Server;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\InvalidArgumentException;
 use GuzzleHttp\Psr7;
-use GuzzleHttp\Utils;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
@@ -127,7 +126,10 @@ class Server
         }
 
         $response = self::getClient()->request('GET', 'guzzle-server/requests');
-        $data = Utils::jsonDecode((string) $response->getBody(), true);
+        $data = \json_decode((string) $response->getBody(), true);
+        if (\JSON_ERROR_NONE !== \json_last_error()) {
+            throw new \RuntimeException('Unable to decode received requests: '.\json_last_error_msg());
+        }
 
         if (!\is_array($data)) {
             throw new \RuntimeException(\sprintf('Expected JSON array of received requests from node.js server; got %s', \get_debug_type($data)));
