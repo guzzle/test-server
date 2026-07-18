@@ -70,3 +70,14 @@ if (!is_int($validatedPort)) {
 Server::$port = $validatedPort;
 Server::$url = sprintf('http://127.0.0.1:%d/', Server::$port);
 ```
+
+#### Sensitive Stack Trace Arguments
+
+Queued and received raw HTTP records are marked with
+`#[\SensitiveParameter]`. PHP 8.2 and later replace those arguments in stack
+traces with `SensitiveParameterValue`. PHP 7.4 through 8.1 do not redact trace
+arguments.
+
+This does not redact the Node server log, other logs, exception messages,
+object properties, wire traffic, captured variables, return values, user
+callbacks, or the separate executing object in an explicit backtrace.

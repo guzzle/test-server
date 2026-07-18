@@ -73,8 +73,10 @@ final class Server
      *
      * @throws InvalidArgumentException
      */
-    public static function enqueue($responses): void
-    {
+    public static function enqueue(
+        #[\SensitiveParameter]
+        $responses
+    ): void {
         if ($responses instanceof ResponseInterface) {
             $responses = [$responses];
         }
@@ -114,8 +116,14 @@ final class Server
      *
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public static function enqueueRaw($statusCode, string $reasonPhrase, array $headers, ?string $body): void
-    {
+    public static function enqueueRaw(
+        $statusCode,
+        string $reasonPhrase,
+        #[\SensitiveParameter]
+        array $headers,
+        #[\SensitiveParameter]
+        ?string $body
+    ): void {
         $data = [
             [
                 'status' => (string) $statusCode,
@@ -139,8 +147,10 @@ final class Server
      *
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public static function enqueueRawBytes(string $bytes): void
-    {
+    public static function enqueueRawBytes(
+        #[\SensitiveParameter]
+        string $bytes
+    ): void {
         self::getClient()->request('PUT', 'guzzle-server/responses', [
             'json' => [
                 [
@@ -176,7 +186,10 @@ final class Server
         }
 
         return \array_map(
-            static function ($message): RequestInterface {
+            static function (
+                #[\SensitiveParameter]
+                $message
+            ): RequestInterface {
                 if (!\is_array($message)) {
                     throw new \RuntimeException('Expected each received request from node.js server to be an array');
                 }

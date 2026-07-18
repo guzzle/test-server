@@ -15,6 +15,7 @@
 - Added a `guzzle-server/stall-brief` endpoint that stalls mid-body for 1.5s, then completes
 - Added `Server::enqueueRawBytes()` to queue verbatim-byte responses that bypass Node's HTTP handling
 - Inline Digest auth so secure endpoints avoid optional `http-auth` and no-qop is deterministic
+- Hide queued and received raw HTTP records in stack traces on PHP 8.2+
 
 ## 0.7.0 - 2026-07-16
 
