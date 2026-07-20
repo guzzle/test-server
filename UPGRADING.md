@@ -1,7 +1,7 @@
 Guzzle Test Server Upgrade Guide
 ================================
 
-0.6 to 1.0
+0.7 to 1.0
 ----------
 
 Guzzle Test Server 1.0 is a major release that raises the minimum PHP version,
@@ -13,14 +13,12 @@ updates the supported Guzzle dependency stack for Guzzle 8 and Guzzle PSR-7
 Guzzle Test Server 1.0 requires PHP `^7.4 || ^8.0`,
 [Guzzle 8.x](https://github.com/guzzle/guzzle/blob/8.0/UPGRADING.md), and
 [Guzzle PSR-7 3.x](https://github.com/guzzle/psr7/blob/3.0/UPGRADING.md).
-Guzzle Test Server 0.6 supported PHP `^7.2.5 || ^8.0`, Guzzle `^7.12.3`, and
-Guzzle PSR-7 `^2.12.3`.
 
-The Node.js runtime requirement is unchanged from 0.6 and remains documented
+The Node.js runtime requirement is unchanged from 0.7 and remains documented
 in the README and package metadata.
 
 If your application still supports PHP 7.2 or 7.3, or still uses Guzzle 7 or
-Guzzle PSR-7 2, continue using Guzzle Test Server 0.6 until your minimum
+Guzzle PSR-7 2, continue using Guzzle Test Server 0.7 until your minimum
 requirements are raised.
 
 #### Server Class Shape
