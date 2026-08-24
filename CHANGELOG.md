@@ -1,5 +1,9 @@
 # Change Log
 
+## 1.0.1 - Upcoming
+
+- Added PHP 8.6 to the supported versions
+
 ## 1.0.0 - 2026-07-20
 
 - Dropped support for PHP 7.2 and 7.3
