@@ -1,0 +1,41 @@
+name: Experiment
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  raw-byte-parts:
+    name: Raw byte parts (${{ matrix.os }}, PHP ${{ matrix.php }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ['ubuntu-24.04', 'windows-2025']
+        php: ['7.4', '8.5']
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          coverage: none
+
+      - name: Set up Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: '22.x'
+
+      - name: Download dependencies
+        run: composer update --no-interaction --no-progress
+
+      - name: Check node syntax
+        run: node --check src/server.js
+
+      - name: Run experiment
+        run: php experiment/raw-byte-parts.php
