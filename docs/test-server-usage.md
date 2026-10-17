@@ -113,6 +113,22 @@ sends a body in response to a HEAD request.
 Server::enqueueRawBytes("HTTP/1.1 200 OK\r\nContent-Length: 5\r\n\r\nhello");
 ```
 
+Use `Server::enqueueRawByteParts()` to queue a single response as verbatim bytes
+written straight to the client socket in parts, bypassing Node's HTTP response
+handling entirely. An integer part waits that many milliseconds before the next
+part is written. The connection is closed after the last part, so a trailing
+delay keeps it open after the response. Use this to emulate servers that stall
+mid-response or hold the connection open after a response.
+
+```php
+Server::enqueueRawByteParts([
+    "HTTP/1.1 200 OK\r\nTransfer-Encoding: chunked\r\n\r\n5\r\nhel",
+    1500,
+    "lo\r\n0\r\n\r\n",
+    3000,
+]);
+```
+
 ## Inspecting Requests
 
 Use `Server::received()` to retrieve the requests sent to the server. Before the

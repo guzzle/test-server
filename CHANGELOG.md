@@ -1,5 +1,9 @@
 # Change Log
 
+## 1.1.0 - Upcoming
+
+- Added `Server::enqueueRawByteParts()` to queue verbatim-byte responses written in delayed parts
+
 ## 1.0.1 - 2026-08-24
 
 - Added support for PHP 8.6

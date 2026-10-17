@@ -392,6 +392,13 @@ var GuzzleServer = function(port, log) {
           if (Object.prototype.hasOwnProperty.call(that.responses[i], 'body') && that.responses[i].body !== null) {
             that.responses[i].body = Buffer.from(that.responses[i].body, 'base64');
           }
+          if (Array.isArray(that.responses[i].parts)) {
+            that.responses[i].parts = that.responses[i].parts.map(function (part) {
+              return Object.prototype.hasOwnProperty.call(part, 'bytes')
+                ? Buffer.from(part.bytes, 'base64')
+                : part.delay;
+            });
+          }
         }
         if (that.log) {
           console.log(that.responses);
@@ -400,6 +407,24 @@ var GuzzleServer = function(port, log) {
       }
       res.end();
     }
+  };
+
+  var rawPartsSockets = new WeakSet();
+
+  var writeRawParts = function(socket, parts) {
+    var index = 0;
+    while (index < parts.length && typeof parts[index] !== 'number') {
+      socket.write(parts[index++]);
+    }
+    if (index === parts.length) {
+      socket.end();
+      return;
+    }
+    setTimeout(function () {
+      if (!socket.destroyed) {
+        writeRawParts(socket, parts.slice(index + 1));
+      }
+    }, parts[index]);
   };
 
   var receivedRequest = function(request, req, res) {
@@ -423,6 +448,11 @@ var GuzzleServer = function(port, log) {
         if (that.log) {
           console.log('Returning raw response from queue');
         }
+        if (Array.isArray(response.parts)) {
+          rawPartsSockets.add(res.socket);
+          writeRawParts(res.socket, response.parts);
+          return;
+        }
         res.socket.end(response.body);
         return;
       }
@@ -434,6 +464,11 @@ var GuzzleServer = function(port, log) {
   this.start = function() {
 
     that.server = http.createServer(function(req, res) {
+      // Node never responds again on a connection that served raw parts.
+      if (rawPartsSockets.has(req.socket)) {
+        req.socket.destroy();
+        return;
+      }
 
       var parts = url.parse(req.url, false);
       var request = {

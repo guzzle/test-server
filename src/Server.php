@@ -162,6 +162,45 @@ final class Server
     }
 
     /**
+     * Queue a single response as verbatim bytes written straight to the client
+     * socket in parts, bypassing Node's HTTP response handling entirely. An
+     * integer part waits that many milliseconds before the next part is
+     * written. The connection is closed after the last part, so a trailing
+     * delay keeps it open after the response. Use this to emulate servers that
+     * stall mid-response or hold the connection open after a response.
+     *
+     * @param array<mixed> $parts Byte strings and non-negative millisecond
+     *                            delays, in write order.
+     *
+     * @throws InvalidArgumentException
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    public static function enqueueRawByteParts(
+        #[\SensitiveParameter]
+        array $parts
+    ): void {
+        $encoded = [];
+        foreach ($parts as $part) {
+            if (\is_string($part)) {
+                $encoded[] = ['bytes' => \base64_encode($part)];
+            } elseif (\is_int($part) && $part >= 0) {
+                $encoded[] = ['delay' => $part];
+            } else {
+                throw new InvalidArgumentException(\sprintf('Invalid raw byte part given; got %s.', \is_int($part) ? (string) $part : \get_debug_type($part)));
+            }
+        }
+
+        self::getClient()->request('PUT', 'guzzle-server/responses', [
+            'json' => [
+                [
+                    'raw' => true,
+                    'parts' => $encoded,
+                ],
+            ],
+        ]);
+    }
+
+    /**
      * Get all of the received requests.
      *
      * Before the server has been started, it returns an empty array.
