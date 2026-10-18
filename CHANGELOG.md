@@ -1,6 +1,6 @@
 # Change Log
 
-## 1.1.0 - Upcoming
+## 1.1.0 - 2026-10-18
 
 - Added `Server::enqueueRawByteParts()` to queue verbatim-byte responses written in delayed parts
 
