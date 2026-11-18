@@ -1,5 +1,9 @@
 # Change Log
 
+## 2.0.0 - Upcoming
+
+- Require `guzzlehttp/guzzle` ^9.0 and `guzzlehttp/psr7` ^4.0
+
 ## 1.1.0 - 2026-10-18
 
 - Added `Server::enqueueRawByteParts()` to queue verbatim-byte responses written in delayed parts
