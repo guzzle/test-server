@@ -4,17 +4,21 @@ Guzzle Test Server Upgrade Guide
 1.x to 2.0
 ----------
 
-Guzzle Test Server 2.0 is a major release that updates the supported Guzzle
-dependency stack for Guzzle 9 and Guzzle PSR-7 4.x.
+Guzzle Test Server 2.0 is a major release that raises the minimum PHP version
+and updates the supported Guzzle dependency stack for Guzzle 9 and Guzzle PSR-7
+4.x.
 
 #### PHP Version and Dependencies
 
-Guzzle Test Server 2.0 requires
-[Guzzle 9.x](https://github.com/guzzle/guzzle/blob/9.0/UPGRADING.md) and
+Guzzle Test Server 2.0 requires PHP `^8.0`,
+[Guzzle 9.x](https://github.com/guzzle/guzzle/blob/9.0/UPGRADING.md), and
 [Guzzle PSR-7 4.x](https://github.com/guzzle/psr7/blob/4.0/UPGRADING.md).
 
-If your application still uses Guzzle 8 or Guzzle PSR-7 3, continue using
-Guzzle Test Server 1.x until your minimum requirements are raised.
+If your application still supports PHP 7.4, or still uses Guzzle 8 or Guzzle
+PSR-7 3, continue using Guzzle Test Server 1.x until your minimum requirements
+are raised.
+
+Guzzle Test Server 2.0 no longer requires `symfony/polyfill-php80`.
 
 0.7 to 1.0
 ----------

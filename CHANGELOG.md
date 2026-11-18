@@ -2,6 +2,7 @@
 
 ## 2.0.0 - Upcoming
 
+- Dropped support for PHP 7
 - Require `guzzlehttp/guzzle` ^9.0 and `guzzlehttp/psr7` ^4.0
 
 ## 1.1.0 - 2026-10-18
