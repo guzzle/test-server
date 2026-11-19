@@ -20,10 +20,9 @@
         }
     ],
     "require": {
-        "php": "^7.4 || ^8.0",
+        "php": "^8.0",
         "guzzlehttp/guzzle": "^9.0@dev",
         "guzzlehttp/psr7": "^4.0@dev",
-        "symfony/polyfill-php80": "^1.25",
         "symfony/polyfill-php82": "^1.27"
     },
     "require-dev": {
